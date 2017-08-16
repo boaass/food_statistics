@@ -18,18 +18,16 @@ class DianPing(Base):
     __tablename__ = 'dianping'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    # 商区
-    commercial_areas = Column(String(20))
     # 菜系分类
     cuisine = Column(String(20))
     # 店名
-    name = Column(String(20))
+    name = Column(String(50))
     # 星级
     star = Column(String(20))
     # 点评数
-    comment_count = Column(Integer)
+    comment_count = Column(String(20))
     # 人均消费
-    avg_price = Column(Integer)
+    avg_price = Column(String(20))
     # 区
     district = Column(String(20))
     # 街道

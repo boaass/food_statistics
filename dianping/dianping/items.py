@@ -9,8 +9,6 @@ import scrapy
 
 
 class DianpingItem(scrapy.Item):
-    # 商区
-    commercial_areas = scrapy.Field()
     # 菜系分类
     cuisine = scrapy.Field()
     # 店名

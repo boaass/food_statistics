@@ -13,9 +13,8 @@ from sqlmodel import create_table, DianPing
 from Logging import Logging
 
 cp = ConfigParser.SafeConfigParser()
-path = os.path.abspath('.') + '/dianping' + 'config.cfg'
+path = os.path.abspath('../..') + '/' + 'config.cfg'
 cp.read(path)
-
 
 class DianpingPipeline(object):
     def __init__(self):
@@ -37,34 +36,24 @@ class DianpingPipeline(object):
 
     def process_item(self, item, spider):
 
-        commercial_areas = item['commercial_areas']
-        cuisine = item['cuisine']
-        name = item['name']
-        star = item['star']
-        comment_count = item['comment_count']
-        avg_price = item['avg_price']
-        district = item['district']
-        street = item['street']
+        cuisines = item['cuisine']
+        names = item['name']
+        stars = item['star']
+        comment_counts = item['comment_count']
+        avg_prices = item['avg_price']
+        districts = item['district']
+        streets = item['street']
 
-        Logging.debug('commercial_areas: ' + commercial_areas)
-        Logging.debug('cuisine: ' + cuisine)
-        Logging.debug('name: ' + name)
-        Logging.debug('star: ' + star)
-        Logging.debug('comment_count: %d' % comment_count)
-        Logging.debug('avg_price: %d' % avg_price)
-        Logging.debug('district: ' + district)
-        Logging.debug('street: ' + street)
-
-        # model = DianPing(commercial_areas=commercial_areas,
-        #                  cuisine=cuisine,
-        #                  name=name,
-        #                  star=star,
-        #                  comment_count=comment_count,
-        #                  avg_price=avg_price,
-        #                  district=district,
-        #                  street=street)
-        # self.db_session.add(model)
-        # self.db_session.commit()
+        for index in range(len(names)):
+            model = DianPing(cuisine=cuisines[index],
+                             name=names[index],
+                             star=stars[index],
+                             comment_count=comment_counts[index],
+                             avg_price=avg_prices[index],
+                             district=districts[index],
+                             street=streets[index])
+            self.db_session.add(model)
+        self.db_session.commit()
 
         return item
 
