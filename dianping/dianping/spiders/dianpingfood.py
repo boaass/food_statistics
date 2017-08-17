@@ -5,11 +5,12 @@ from scrapy.spiders import CrawlSpider, Rule
 from ..items import DianpingItem
 from ..Logging import Logging
 from lxml import etree
+import time
 
 class DianpingfoodSpider(CrawlSpider):
     name = 'dianpingfood'
-    allowed_domains = ['www.dianping.com']
-    start_urls = ['https://www.dianping.com/tianjin/food']
+    allowed_domains = [u'www.dianping.com']
+    start_urls = [u'https://www.dianping.com/tianjin/food']
 
 
     # https://www.dianping.com/search/category/10/10/r51p1
@@ -18,7 +19,8 @@ class DianpingfoodSpider(CrawlSpider):
     )
 
     def __init__(self, *a, **kw):
-        self.headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36'}
+        self.headers = {u'User-Agent': u'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36'}
+        self.domain = self.start_urls[0].split('//')[0] + u'//' + self.allowed_domains[0]
         super(DianpingfoodSpider, self).__init__(*a, **kw)
 
     def parse_item(self, response):
@@ -28,12 +30,14 @@ class DianpingfoodSpider(CrawlSpider):
         item = DianpingItem()
         # 解析
         names = []
+        shop_urls = []
         stars = []
         cuisines = []
         districts = []
         comment_counts = []
         avg_prices = []
         streets = []
+        update_times = []
         datas = response.xpath('//li[@class=""]/div[@class="txt"]').extract()
         for index in range(len(datas)):
             Logging.debug('<---------- %d ---------->' % index)
@@ -42,6 +46,9 @@ class DianpingfoodSpider(CrawlSpider):
 
             name_list = selector.xpath('//div[@class="tit"]/a/h4/text()')
             names.append(name_list[0].encode('u8')) if len(name_list) != 0 else names.append('')
+
+            shop_url_list = selector.xpath('//div[@class="tit"]/a/@href')
+            shop_urls.append((self.domain+shop_url_list[0]).encode('u8')) if len(shop_url_list) != 0 else shop_urls.append('')
 
             star_list = selector.xpath('//div[@class="comment"]/span/@title')
             stars.append(star_list[0].encode('u8')) if len(star_list) != 0 else stars.append('')
@@ -59,23 +66,29 @@ class DianpingfoodSpider(CrawlSpider):
             street_list = selector.xpath('//div[@class="tag-addr"]/span[@class="addr"]/text()')
             streets.append(street_list[0].encode('u8')) if len(street_list) != 0 else streets.append('')
 
+            update_times.append(time.strftime('%Y-%m-%d %X', time.localtime()))
+
             Logging.info('name: %s' % names[index])
+            Logging.info('shop_url: %s' % shop_urls[index])
             Logging.info('star: %s' % stars[index])
             Logging.info('cuisine: %s' % cuisines[index])
             Logging.info('comment_count: %s' % comment_counts[index])
             Logging.info('avg_price: %s' % avg_prices[index])
             Logging.info('district: %s' % districts[index])
             Logging.info('street: %s' % streets[index])
+            Logging.info('update: %s' % update_times[index])
 
             Logging.debug('<---------- %d ---------->' % index)
 
         item['name'] = names
+        item['shop_url'] = shop_urls
         item['star'] = stars
         item['cuisine'] = cuisines
         item['comment_count'] = comment_counts
         item['avg_price'] = avg_prices
         item['district'] = districts
         item['street'] = streets
+        item['update_time'] = update_times
 
         Logging.debug('<---------- 解析完成 ---------->')
 

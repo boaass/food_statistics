@@ -13,6 +13,8 @@ class DianpingItem(scrapy.Item):
     cuisine = scrapy.Field()
     # 店名
     name = scrapy.Field()
+    # 店址
+    shop_url = scrapy.Field()
     # 星级
     star = scrapy.Field()
     # 点评数
@@ -23,3 +25,6 @@ class DianpingItem(scrapy.Item):
     district = scrapy.Field()
     # 街道
     street = scrapy.Field()
+    # 更新时间
+    update_time = scrapy.Field()
+
