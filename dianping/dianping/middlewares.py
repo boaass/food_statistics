@@ -6,7 +6,8 @@
 # http://doc.scrapy.org/en/latest/topics/spider-middleware.html
 
 from scrapy import signals
-
+from IPProxyTool import IPProxyTool
+from random import choice
 
 class DianpingSpiderMiddleware(object):
     # Not all methods need to be defined. If a method is not defined,
@@ -49,7 +50,11 @@ class DianpingSpiderMiddleware(object):
         # that it doesn’t have a response associated.
 
         # Must return only requests (not items).
+        ipTool = IPProxyTool()
+        ipTool.refresh()
+
         for r in start_requests:
+            r.meta['proxy'] = 'http://' + choice(ipTool.getIPs()) if len(ipTool.getIPs()) != 0 else None
             yield r
 
     def spider_opened(self, spider):

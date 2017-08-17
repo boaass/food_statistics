@@ -11,10 +11,15 @@ class DianpingfoodSpider(CrawlSpider):
     allowed_domains = ['www.dianping.com']
     start_urls = ['https://www.dianping.com/tianjin/food']
 
+
     # https://www.dianping.com/search/category/10/10/r51p1
     rules = (
         Rule(LinkExtractor(allow=r'.*?/search/category/10/10/.*?'), callback='parse_item', follow=True),
     )
+
+    def __init__(self, *a, **kw):
+        self.headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36'}
+        super(DianpingfoodSpider, self).__init__(*a, **kw)
 
     def parse_item(self, response):
         Logging.debug('<---------- 开始解析 ---------->')
@@ -71,32 +76,6 @@ class DianpingfoodSpider(CrawlSpider):
         item['avg_price'] = avg_prices
         item['district'] = districts
         item['street'] = streets
-
-        # [Logging.info('name: %s' % name) for name in item['name']]
-        #
-        # item['star'] = response.xpath('//li[@class=""]/div[@class="txt"]/div[@class="comment"]/span/@title').extract()
-        # [Logging.info('star: %s' % star) for star in item['star']]
-        #
-        # tag_addrs = response.xpath('//li[@class=""]/div[@class="txt"]/div[@class="tag-addr"]/a/span['
-        #                                  '@class="tag"]/text()').extract()
-        #
-        # item['cuisine'] = tag_addrs[::2]
-        # [Logging.info('cuisine: %s' % cuisine) for cuisine in item['cuisine']]
-        #
-        # item['comment_count'] = response.xpath('//li[@class=""]/div[@class="txt"]/div[@class="comment"]/a['
-        #                                        '@class="review-num"]/b/text()').extract()
-        # [Logging.info('comment_count: %s' % comment_count) for comment_count in item['comment_count']]
-        #
-        # item['avg_price'] = response.xpath('//li[@class=""]/div[@class="txt"]/div[@class="comment"]/a['
-        #                                    '@class="mean-price"]/b/text()').extract()
-        # [Logging.info('avg_price: %s' % avg_price) for avg_price in item['avg_price']]
-        #
-        # item['district'] = tag_addrs[1::2]
-        # [Logging.info('district: %s' % district) for district in item['district']]
-        #
-        # item['street'] = response.xpath('//li[@class=""]/div[@class="txt"]/div[@class="tag-addr"]/span['
-        #                                 '@class="addr"]/text()').extract()
-        # [Logging.info('street: %s' % street) for street in item['street']]
 
         Logging.debug('<---------- 解析完成 ---------->')
 
