@@ -8,6 +8,8 @@
 from scrapy import signals
 from IPProxyTool import IPProxyTool
 from random import choice
+from scrapy.downloadermiddlewares.retry import RetryMiddleware
+from scrapy.utils.response import response_status_message
 
 class DianpingSpiderMiddleware(object):
     # Not all methods need to be defined. If a method is not defined,
@@ -16,7 +18,6 @@ class DianpingSpiderMiddleware(object):
 
     def __init__(self):
         self.ipTool = IPProxyTool()
-        self.ipTool.refresh()
         super(DianpingSpiderMiddleware, self).__init__()
 
     @classmethod
@@ -67,3 +68,18 @@ class DianpingSpiderMiddleware(object):
 
     def spider_opened(self, spider):
         spider.logger.info('Spider opened: %s' % spider.name)
+
+class DianpingSpiderRetryMiddleware(RetryMiddleware):
+
+    def process_response(self, request, response, spider):
+        print '==========================='
+        if request.meta.get('dont_retry', False):
+            return response
+
+        if response.status in self.retry_http_codes:
+            reason = response_status_message(response.status)
+            request.meta['proxy'] = 'http://' + choice(IPProxyTool().getIPs()) if len(IPProxyTool().getIPs()) != 0 else None
+            return self._retry(request, reason, spider) or response
+
+        return response
+

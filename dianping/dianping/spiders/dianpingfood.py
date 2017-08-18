@@ -10,10 +10,10 @@ import time
 class DianpingfoodSpider(CrawlSpider):
     name = 'dianpingfood'
     allowed_domains = [u'www.dianping.com']
-    start_urls = [u'https://www.dianping.com/search/category/10/10/r51']
+    start_urls = [u'https://www.dianping.com/search/category/10/10#breadCrumb']
 
     rules = (
-        Rule(LinkExtractor(allow=r'.*?/search/category/10/10/g\d+r\d+'), callback='parse_item', follow=True),
+        Rule(LinkExtractor(allow=r'.*?/search/category/10/10/g\d+?$'), callback='parse_item', follow=True),
     )
 
     def __init__(self, *a, **kw):
@@ -38,7 +38,7 @@ class DianpingfoodSpider(CrawlSpider):
         update_times = []
         datas = response.xpath('//li[@class=""]/div[@class="txt"]').extract()
         for index in range(len(datas)):
-            Logging.debug('<---------- %d ---------->' % index)
+            Logging.debug('<---------- item %d ---------->' % index)
             data = datas[index]
             selector = etree.HTML(data)
 
@@ -76,7 +76,7 @@ class DianpingfoodSpider(CrawlSpider):
             Logging.info('street: %s' % streets[index])
             Logging.info('update: %s' % update_times[index])
 
-            Logging.debug('<---------- %d ---------->' % index)
+            Logging.debug('<---------- item %d ---------->' % index)
 
         item['name'] = names
         item['shop_url'] = shop_urls

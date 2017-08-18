@@ -3,7 +3,16 @@ import requests
 import json
 from Logging import Logging
 
-class IPProxyTool(object):
+
+class Singleton(object):
+    _instance = None
+    def __new__(cls, *args, **kwargs):
+        if not cls._instance:
+            cls._instance = super(Singleton, cls).__new__(cls, *args, **kwargs)
+        return cls._instance
+
+
+class IPProxyTool(Singleton):
 
     def __init__(self):
         self.ip_pool = []
@@ -20,15 +29,16 @@ class IPProxyTool(object):
             # Logging.debug(res.text)
             Logging.error(e.message)
 
-    def circleRequestIPs(self, retryTime):
-        if retryTime == 0 or len(self.ip_pool)>5:
+    def circleRequestIPs(self, retryTime, min_ip_count):
+        if retryTime == 0 or len(self.ip_pool)>=min_ip_count:
             return
         self.requestIPs()
 
-        return self.circleRequestIPs(retryTime-1)
+        return self.circleRequestIPs(retryTime-1, min_ip_count)
 
-    def refresh(self):
-        self.circleRequestIPs(5)
+    def refresh(self, retryTime=5, min_ip_count=10):
+        self.ip_pool = []
+        self.circleRequestIPs(retryTime, min_ip_count)
 
     def isValidIP(self, address):
         try:
@@ -48,5 +58,5 @@ class IPProxyTool(object):
         return self.ip_pool
 
 # tool = IPProxyTool()
-# tool.refresh()
+# tool.refresh(10, 10)
 # [Logging.info(ip) for ip in tool.getIPs()]
