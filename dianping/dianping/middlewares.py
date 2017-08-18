@@ -14,6 +14,11 @@ class DianpingSpiderMiddleware(object):
     # scrapy acts as if the spider middleware does not modify the
     # passed objects.
 
+    def __init__(self):
+        self.ipTool = IPProxyTool()
+        self.ipTool.refresh()
+        super(DianpingSpiderMiddleware, self).__init__()
+
     @classmethod
     def from_crawler(cls, crawler):
         # This method is used by Scrapy to create your spiders.
@@ -50,12 +55,15 @@ class DianpingSpiderMiddleware(object):
         # that it doesn’t have a response associated.
 
         # Must return only requests (not items).
-        ipTool = IPProxyTool()
-        ipTool.refresh()
+
 
         for r in start_requests:
-            r.meta['proxy'] = 'http://' + choice(ipTool.getIPs()) if len(ipTool.getIPs()) != 0 else None
             yield r
+
+    def process_request(self, request, spider):
+        request.meta['proxy'] = 'http://' + choice(self.ipTool.getIPs()) if len(self.ipTool.getIPs()) != 0 else None
+        print 'currnent proxy ip: ' + request.meta['proxy']
+
 
     def spider_opened(self, spider):
         spider.logger.info('Spider opened: %s' % spider.name)

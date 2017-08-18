@@ -13,12 +13,12 @@ class IPProxyTool(object):
         res = requests.get('http://www.xdaili.cn/ipagent//freeip/getFreeIps?page=1&rows=10', timeout=3)
         try:
             res_dict = json.loads(res.text)
-            for ip_dict in res_dict['rows']:
+            for ip_dict in res_dict['RESULT']['rows']:
                 address = (ip_dict['ip']+':'+ip_dict['port']).encode('u8')
                 self.ip_pool.append(address) if self.isValidIP(address) else None
         except Exception as e:
+            # Logging.debug(res.text)
             Logging.error(e.message)
-            self.ip_pool = []
 
     def circleRequestIPs(self, retryTime):
         if retryTime == 0 or len(self.ip_pool)>5:

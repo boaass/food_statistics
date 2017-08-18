@@ -46,7 +46,6 @@ class DianpingPipeline(object):
         streets = item['street']
         update_times = item['update_time']
 
-        # 查询
 
         for index in range(len(names)):
             model = DianPing(cuisine=cuisines[index],
