@@ -29,7 +29,7 @@ ROBOTSTXT_OBEY = True
 # See also autothrottle settings and docs
 DOWNLOAD_DELAY = 1
 # 超时时间
-DOWNLOAD_TIMEOUT = 3
+DOWNLOAD_TIMEOUT = 20
 # 重试次数
 RETRY_TIMES = 3
 # The download delay setting will honor only one of:

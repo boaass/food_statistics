@@ -72,7 +72,6 @@ class DianpingSpiderMiddleware(object):
 class DianpingSpiderRetryMiddleware(RetryMiddleware):
 
     def process_response(self, request, response, spider):
-        print '==========================='
         if request.meta.get('dont_retry', False):
             return response
 
