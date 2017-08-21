@@ -12,6 +12,7 @@ from scrapy.downloadermiddlewares.retry import RetryMiddleware
 from scrapy.utils.response import response_status_message
 from Logging import Logging
 
+
 class DianpingSpiderMiddleware(object):
     # Not all methods need to be defined. If a method is not defined,
     # scrapy acts as if the spider middleware does not modify the
@@ -69,8 +70,8 @@ class DianpingSpiderMiddleware(object):
     def spider_opened(self, spider):
         spider.logger.info('Spider opened: %s' % spider.name)
 
-class DianpingSpiderRetryMiddleware(RetryMiddleware):
 
+class DianpingSpiderRetryMiddleware(RetryMiddleware):
     # def process_response(self, request, response, spider):
     #     if request.meta.get('dont_retry', False):
     #         return response
@@ -85,15 +86,17 @@ class DianpingSpiderRetryMiddleware(RetryMiddleware):
 
     def process_exception(self, request, exception, spider):
         if isinstance(exception, self.EXCEPTIONS_TO_RETRY) and not request.meta.get('dont_retry', False):
-            Logging.warning('<---------- {(url)%s (retry_time):%s} ---------->' % (request.url, request.meta.get('retry_times', 0)))
-            if request.meta.get('retry_times', 0) == 4:
+            Logging.warning(
+                '<---------- {(url)%s (retry_time):%s} ---------->' % (request.url, request.meta.get('retry_times', 0)))
+            if request.meta.get('retry_times', 0) == 2:
                 request.meta['proxy'] = None
-            elif request.meta.get('retry_times', 0) == 5:
-                f = open('fail_urls', 'a+')
+            elif request.meta.get('retry_times', 0) == 3:
+                f = open('fail_urls.txt', 'a+')
                 f.write(request.url + '\n')
                 f.close()
             else:
-                request.meta['proxy'] = 'http://' + choice(IPProxyTool().getIPs()) if len(IPProxyTool().getIPs()) != 0 else None
+                request.meta['proxy'] = 'http://' + choice(IPProxyTool().getIPs()) if len(
+                    IPProxyTool().getIPs()) != 0 else None
+                request = request.replace(url=request.url.split('?')[0]) if len(request.url.split('?')) > 0 else None
 
             return self._retry(request, exception, spider)
-

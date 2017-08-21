@@ -6,15 +6,16 @@ from ..items import DianpingItem
 from ..Logging import Logging
 from lxml import etree
 import time
+import re
 
-f = open('urls.txt', 'w+')
+f = open('urls.txt', 'a+')
 class DianpingfoodSpider(CrawlSpider):
     name = 'dianpingfood'
     allowed_domains = [u'www.dianping.com']
     start_urls = [u'https://www.dianping.com/search/category/10/10#breadCrumb']
 
     rules = (
-        Rule(LinkExtractor(allow=r'.*?/search/category/10/10/g\d+(p\d+\?aid=.*?)?$', deny=r'.*?/search/category/10/10/g118'),callback='parse_item', follow=True),
+        Rule(LinkExtractor(allow=r'.*?/search/category/10/10/g\d+(p\d+\?aid=.*?)?$'), callback='parse_item', follow=True),
     )
 
     def __init__(self, *a, **kw):
@@ -23,6 +24,9 @@ class DianpingfoodSpider(CrawlSpider):
         super(DianpingfoodSpider, self).__init__(*a, **kw)
 
     def parse_item(self, response):
+        if re.match(r".*?/search/category/10/10/g118(p\d+.*)?$", response.url):
+            return
+
         Logging.debug('<---------- 开始解析 ---------->')
         Logging.info('url: %s' % response.url)
 
