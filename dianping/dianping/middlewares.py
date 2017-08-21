@@ -72,15 +72,22 @@ class DianpingSpiderMiddleware(object):
 
 class DianpingSpiderRetryMiddleware(RetryMiddleware):
 
-    def process_response(self, request, response, spider):
-        if request.meta.get('dont_retry', False):
-            return response
+    # def process_response(self, request, response, spider):
+    #     if request.meta.get('dont_retry', False):
+    #         return response
+    #
+    #     if response.status in self.retry_http_codes:
+    #         Logging.warning('<---------- url:%s retry ---------->' % request.url)
+    #         reason = response_status_message(response.status)
+    #         request.meta['proxy'] = 'http://' + choice(IPProxyTool().getIPs()) if len(IPProxyTool().getIPs()) != 0 else None
+    #         return self._retry(request, reason, spider) or response
+    #
+    #     return response
 
-        if response.status in self.retry_http_codes:
-            Logging.warning('<---------- url:%s retry ---------->')
-            reason = response_status_message(response.status)
+    def process_exception(self, request, exception, spider):
+        if isinstance(exception, self.EXCEPTIONS_TO_RETRY) and not request.meta.get('dont_retry', False):
+            Logging.warning('<---------- url:%s retry ---------->' % request.url)
             request.meta['proxy'] = 'http://' + choice(IPProxyTool().getIPs()) if len(IPProxyTool().getIPs()) != 0 else None
-            return self._retry(request, reason, spider) or response
 
-        return response
+            return self._retry(request, exception, spider)
 

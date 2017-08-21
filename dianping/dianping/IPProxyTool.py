@@ -14,8 +14,7 @@ class Singleton(object):
 
 class IPProxyTool(Singleton):
 
-    def __init__(self):
-        self.ip_pool = []
+    ip_pool = []
 
     def requestIPs(self):
         # 讯代理
@@ -59,4 +58,6 @@ class IPProxyTool(Singleton):
 
 # tool = IPProxyTool()
 # tool.refresh(10, 10)
-# [Logging.info(ip) for ip in tool.getIPs()]
+# print(tool.getIPs())
+#
+# print(IPProxyTool().getIPs())
