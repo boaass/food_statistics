@@ -66,7 +66,7 @@ class DianpingfoodSpider(CrawlSpider):
             comment_counts.append(comment_count_list[0].encode('u8')) if len(comment_count_list) != 0 else comment_counts.append('0')
 
             avg_price_list = selector.xpath('//div[@class="comment"]/a[@class="mean-price"]/b/text()')
-            avg_prices.append(avg_price_list[0].encode('u8')) if len(avg_price_list) != 0 else avg_prices.append('')
+            avg_prices.append(avg_price_list[0].replace(u'￥', u'').encode('u8')) if len(avg_price_list) != 0 else avg_prices.append('')
 
             street_list = selector.xpath('//div[@class="tag-addr"]/span[@class="addr"]/text()')
             streets.append(street_list[0].encode('u8')) if len(street_list) != 0 else streets.append('')
