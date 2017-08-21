@@ -15,6 +15,7 @@ class Singleton(object):
 class IPProxyTool(Singleton):
 
     ip_pool = []
+    destIP = 'https://www.baidu.com'
 
     def requestIPs(self):
         # 讯代理
@@ -36,12 +37,14 @@ class IPProxyTool(Singleton):
         return self.circleRequestIPs(retryTime-1, min_ip_count)
 
     def refresh(self, retryTime=5, min_ip_count=10):
-        self.ip_pool = []
+        for proxy_ip in self.ip_pool:
+            if not self.isValidIP(proxy_ip):
+                self.ip_pool.remove(proxy_ip)
         self.circleRequestIPs(retryTime, min_ip_count)
 
     def isValidIP(self, address):
         try:
-            res = requests.get('https://www.baidu.com', proxies={"http":"http://%s" % address}, timeout=2)
+            res = requests.get(self.destIP, proxies={"http":"http://%s" % address}, timeout=2)
         except Exception as e:
             Logging.warning('proxy ip: %s is invalid...' % address)
             return False

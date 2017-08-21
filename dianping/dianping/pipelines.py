@@ -6,13 +6,13 @@
 # See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
 
 import os
-import threading
-import ConfigParser
+import ConfigParser, threading
 from sqlalchemy import create_engine, MetaData
 from sqlalchemy.orm import sessionmaker
 from sqlmodel import create_table, DianPing
 from Logging import Logging
 from IPProxyTool import IPProxyTool
+from apscheduler.schedulers.blocking import BlockingScheduler
 
 cp = ConfigParser.SafeConfigParser()
 path = os.path.abspath('../..') + '/' + 'config.cfg'
@@ -37,9 +37,13 @@ class DianpingPipeline(object):
         create_table(engine)
 
         self.ipTool = IPProxyTool()
+        self.ipTool.destIP = 'https://www.dianping.com'
         self.ipTool.refresh()
-        self.time = threading.Timer(300, self.ipTool.refresh)
-        self.time.start()
+
+        self.thread = threading.Thread(target=self.schedule)
+        self.thread.setDaemon(True)
+        self.thread.start()
+
 
     def process_item(self, item, spider):
 
@@ -71,5 +75,9 @@ class DianpingPipeline(object):
 
     def close_spider(self, spider):
         self.db_session.close()
-        self.time.cancel()
+
+    def schedule(self):
+        scheduler = BlockingScheduler()
+        scheduler.add_job(self.ipTool.refresh, 'interval', seconds=300)
+        scheduler.start()
 

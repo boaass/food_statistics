@@ -66,7 +66,6 @@ class DianpingSpiderMiddleware(object):
         request.meta['proxy'] = 'http://' + choice(self.ipTool.getIPs()) if len(self.ipTool.getIPs()) != 0 else None
         Logging.debug('{(request_url)%s : (proxy)%s}' % (request.url, request.meta['proxy']))
 
-
     def spider_opened(self, spider):
         spider.logger.info('Spider opened: %s' % spider.name)
 
@@ -86,8 +85,15 @@ class DianpingSpiderRetryMiddleware(RetryMiddleware):
 
     def process_exception(self, request, exception, spider):
         if isinstance(exception, self.EXCEPTIONS_TO_RETRY) and not request.meta.get('dont_retry', False):
-            Logging.warning('<---------- url:%s retry ---------->' % request.url)
-            request.meta['proxy'] = 'http://' + choice(IPProxyTool().getIPs()) if len(IPProxyTool().getIPs()) != 0 else None
+            Logging.warning('<---------- {(url)%s (retry_time):%s} ---------->' % (request.url, request.meta.get('retry_times', 0)))
+            if request.meta.get('retry_times', 0) == 4:
+                request.meta['proxy'] = None
+            elif request.meta.get('retry_times', 0) == 5:
+                f = open('fail_urls', 'a+')
+                f.write(request.url + '\n')
+                f.close()
+            else:
+                request.meta['proxy'] = 'http://' + choice(IPProxyTool().getIPs()) if len(IPProxyTool().getIPs()) != 0 else None
 
             return self._retry(request, exception, spider)
 
