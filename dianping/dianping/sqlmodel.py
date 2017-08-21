@@ -2,6 +2,7 @@
 
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, String, Integer
+import time
 
 Base = declarative_base()
 
@@ -15,7 +16,7 @@ def drop_table(engine):
 
 
 class DianPing(Base):
-    __tablename__ = 'dianping'
+    __tablename__ = 'dianping_%s' % time.strftime("%Y%m%d%H%M", time.localtime(time.time()))
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     # 菜系分类
